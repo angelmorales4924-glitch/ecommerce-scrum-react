@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import Carrito from './components/Carrito.jsx';
+import useAuth from './hooks/useAuth.js';
 
 export default function App() {
+  const { usuario, iniciarSesion, cerrarSesion } = useAuth();
 
   const productoPrueba = {
     id: 1,
@@ -63,6 +65,39 @@ export default function App() {
   return (
     <main>
       <h1>NovaShop</h1>
+
+      <hr />
+
+      <h2>Prueba de H01 - Login / Registro</h2>
+
+      {usuario ? (
+        <div>
+          <p>
+            Sesión iniciada como: <strong>{usuario.nombre}</strong>
+          </p>
+
+          <p>
+            Correo: {usuario.correo}
+          </p>
+
+          <button onClick={cerrarSesion}>
+            Cerrar sesión
+          </button>
+        </div>
+      ) : (
+        <button
+          onClick={() =>
+            iniciarSesion(
+              'Angel',
+              'angel@correo.com'
+            )
+          }
+        >
+          Probar inicio de sesión
+        </button>
+      )}
+
+      <hr />
 
       <h2>Prueba de H04 - Carrito</h2>
 
