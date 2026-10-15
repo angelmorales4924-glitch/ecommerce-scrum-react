@@ -3,6 +3,7 @@ import { useState } from 'react';
 import Carrito from './components/Carrito.jsx';
 import Catalogo from './components/Catalogo.jsx';
 import DetalleProducto from './components/DetalleProducto.jsx';
+import Checkout from './components/Checkout.jsx';
 
 import useAuth from './hooks/useAuth.js';
 import { PRODUCTOS } from './data/productos.js';
@@ -76,6 +77,10 @@ export default function App() {
     );
   }
 
+  function confirmarPedido() {
+    setCarrito([]);
+  }
+
   return (
     <main>
       <h1>NovaShop</h1>
@@ -141,6 +146,14 @@ export default function App() {
           onEliminar={eliminarDelCarrito}
         />
       </section>
+
+      <hr />
+
+      <Checkout
+        usuario={usuario}
+        carrito={carrito}
+        onConfirmar={confirmarPedido}
+      />
     </main>
   );
 }
