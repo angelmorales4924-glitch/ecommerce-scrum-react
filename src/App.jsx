@@ -4,15 +4,19 @@ import Carrito from './components/Carrito.jsx';
 import Catalogo from './components/Catalogo.jsx';
 import DetalleProducto from './components/DetalleProducto.jsx';
 import Checkout from './components/Checkout.jsx';
+import Recomendaciones from './components/Recomendaciones.jsx';
 
 import useAuth from './hooks/useAuth.js';
 import { PRODUCTOS } from './data/productos.js';
 
 export default function App() {
-  const { usuario, iniciarSesion, cerrarSesion } = useAuth();
+  const { usuario, iniciarSesion, cerrarSesion } =
+    useAuth();
 
-  const [productoSeleccionado, setProductoSeleccionado] =
-    useState(null);
+  const [
+    productoSeleccionado,
+    setProductoSeleccionado
+  ] = useState(null);
 
   const [carrito, setCarrito] = useState([]);
 
@@ -73,7 +77,9 @@ export default function App() {
 
   function eliminarDelCarrito(id) {
     setCarrito(
-      carrito.filter((item) => item.id !== id)
+      carrito.filter(
+        (item) => item.id !== id
+      )
     );
   }
 
@@ -131,6 +137,15 @@ export default function App() {
 
       <DetalleProducto
         producto={productoSeleccionado}
+        onAgregar={agregarAlCarrito}
+      />
+
+      <hr />
+
+      <Recomendaciones
+        productos={PRODUCTOS}
+        productoActual={productoSeleccionado}
+        onSeleccionar={setProductoSeleccionado}
         onAgregar={agregarAlCarrito}
       />
 
