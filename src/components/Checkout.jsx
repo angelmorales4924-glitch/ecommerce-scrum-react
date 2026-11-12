@@ -1,101 +1,75 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
+import CheckoutStepper from './CheckoutStepper';
+import ShippingStep from './ShippingStep';
+import PaymentStep from './PaymentStep';
+import ReviewStep from './ReviewStep';
 
-export default function Checkout({
-  usuario,
-  carrito,
-  onConfirmar
-}) {
-  const [direccion, setDireccion] = useState('');
-  const [pago, setPago] = useState('Tarjeta (simulación)');
-  const [mensaje, setMensaje] = useState('');
+export default function Checkout({ usuario, carrito, onConfirmar }) {
+  const [currentStep, setCurrentStep] = useState(1);
+  const [shippingData, setShippingData] = useState({ address: '', method: 'standard' });
+  const [paymentData, setPaymentData] = useState({ method: 'card' });
+  const [isCompleted, setIsCompleted] = useState(false);
 
-  function confirmar(event) {
-    event.preventDefault();
+  if (carrito.length === 0 && !isCompleted) {
+    return (
+      <section className="checkout-section">
+        <h2>H08-H10 - Checkout por pasos</h2>
+        <p>Tu carrito está vacío. Agrega productos para iniciar el proceso de compra.</p>
+      </section>
+    );
+  }
 
-    if (!usuario) {
-      setMensaje(
-        'Inicia sesión antes de confirmar el pedido.'
-      );
-      return;
-    }
-
-    if (carrito.length === 0) {
-      setMensaje(
-        'Agrega al menos un producto al carrito.'
-      );
-      return;
-    }
-
-    if (!direccion.trim()) {
-      setMensaje(
-        'Escribe una dirección de entrega para continuar.'
-      );
-      return;
-    }
-
-    if (!pago) {
-      setMensaje(
-        'Selecciona un método de pago.'
-      );
-      return;
-    }
-
-    const pedido =
-      `PED-${Date.now().toString().slice(-6)}`;
-
-    onConfirmar();
-
-    setDireccion('');
-
-    setMensaje(
-      `Pedido ${pedido} confirmado correctamente. Pago simulado.`
+  if (isCompleted) {
+    return (
+      <section className="checkout-section success-box">
+        <h2>¡Compra Confirmada con Éxito!</h2>
+        <p>Gracias por tu compra, <strong>{usuario ? usuario.nombre : 'Cliente'}</strong>.</p>
+        <p>Hemos enviado los detalles de tu pedido y guía de envío a tu correo registrado.</p>
+        <button 
+          className="btn-primary" 
+          onClick={() => {
+            setIsCompleted(false);
+            setCurrentStep(1);
+            onConfirmar();
+          }}
+        >
+          Regresar al Catálogo
+        </button>
+      </section>
     );
   }
 
   return (
-    <section>
-      <h2>H05 - Checkout</h2>
+    <section className="checkout-section">
+      <h2>H08-H10 - Proceso de Compra (Checkout)</h2>
+      
+      <CheckoutStepper currentStep={currentStep} />
 
-      <p>
-        Confirmación académica de compra.
-        No se procesan pagos reales.
-      </p>
-
-      <form onSubmit={confirmar}>
-        <textarea
-          placeholder="Dirección de entrega"
-          value={direccion}
-          onChange={(event) =>
-            setDireccion(event.target.value)
-          }
+      {currentStep === 1 && (
+        <ShippingStep 
+          onNext={() => setCurrentStep(2)} 
+          shippingData={shippingData} 
+          setShippingData={setShippingData} 
         />
+      )}
 
-        <select
-          value={pago}
-          onChange={(event) =>
-            setPago(event.target.value)
-          }
-        >
-          <option>
-            Tarjeta (simulación)
-          </option>
+      {currentStep === 2 && (
+        <PaymentStep 
+          onNext={() => setCurrentStep(3)} 
+          onBack={() => setCurrentStep(1)} 
+          paymentData={paymentData} 
+          setPaymentData={setPaymentData} 
+        />
+      )}
 
-          <option>
-            Transferencia (simulación)
-          </option>
-
-          <option>
-            Pago contra entrega (simulación)
-          </option>
-        </select>
-
-        <button type="submit">
-          Confirmar pedido
-        </button>
-      </form>
-
-      {mensaje && (
-        <p>{mensaje}</p>
+      {currentStep === 3 && (
+        <ReviewStep 
+          cartItems={carrito} 
+          shippingData={shippingData} 
+          paymentData={paymentData} 
+          onBack={() => setCurrentStep(2)} 
+          onConfirm={() => setIsCompleted(true)} 
+        />
       )}
     </section>
   );
